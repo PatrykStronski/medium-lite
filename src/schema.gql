@@ -2,11 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-enum UserRole{
-  admin
-  user
-}
-
 """post"""
 type Post {
   id: ID!
@@ -19,23 +14,29 @@ type User {
   id: ID!
   name: String!
   email: String!
-  password: String!
-  role: UserRole!
-  posts: [Post]!
+  role: String!
+  posts: Post!
 }
 
 type Query {
-  user(id: String!): User!
-  users: [User!]!
+  user(id: Float!): User!
+  users(pagination: UserPagination!): [User!]!
+}
+
+"""offset pagination"""
+input UserPagination {
+  cursorId: Float!
+  take: Float!
 }
 
 type Mutation {
-  createUser(NewUserInput): User
+  createUser(user: NewUserInput!): User!
 }
 
+"""user"""
 input NewUserInput {
   name: String!
   email: String!
   password: String!
-  role: UserRole
+  role: String!
 }

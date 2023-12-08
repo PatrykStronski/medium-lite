@@ -1,16 +1,6 @@
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { User, UserRole } from "./users.model";
+import { NewUserInput, User, UserPagination, UserRole } from "./users.model";
 import { UsersService } from "./users.service";
-import { Prisma } from "@prisma/client";
-
-const sampleUser = {
-    id: 1,
-    name: '1',
-    email: '1', // unique
-    password: '1',
-    role: UserRole.admin,
-    posts: []
-} as User;
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -22,12 +12,12 @@ export class UsersResolver {
     }
 
     @Query(() => [User])
-    async users() {
-        return await this.usersService.users();
+    async users(@Args('pagination') pagination: UserPagination) {
+        return await this.usersService.users(pagination);
     }
 
     @Mutation(() => User)
-    async createUser(@Args({ name: 'user', type: () => User }) user: Prisma.UserCreateInput) {
+    async createUser(@Args('user') user: NewUserInput) {
         return await this.usersService.createUser(user)
     }
 }

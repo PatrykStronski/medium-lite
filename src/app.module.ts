@@ -8,6 +8,7 @@ import { UsersResolver } from './users/users.resolver';
 import { PostsService } from './posts/posts.service';
 import { UsersService } from './users/users.service';
 import { PrismaService } from './prisma.service';
+import { AuthController } from './auth/auth.controller';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { PrismaService } from './prisma.service';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
   ],
-  controllers: [AppController],
+  controllers: [AppController, AuthController],
   providers: [AppService, UsersResolver, PostsService, UsersService, PrismaService],
 })
 export class AppModule {}
