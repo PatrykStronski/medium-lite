@@ -14,19 +14,20 @@ type User {
   id: ID!
   name: String!
   email: String!
+  password: String!
   role: String!
   posts: Post!
 }
 
 type Query {
   user(id: Float!): User!
-  users(pagination: UserPagination!): [User!]!
+  users(pagination: UserPagination): [User!]!
 }
 
 """offset pagination"""
 input UserPagination {
-  cursorId: Float!
-  take: Float!
+  cursorId: Float
+  take: Float
 }
 
 type Mutation {
@@ -39,4 +40,5 @@ input NewUserInput {
   email: String!
   password: String!
   role: String!
+  salt: String
 }

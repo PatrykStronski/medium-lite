@@ -9,6 +9,7 @@ import { PostsService } from './posts/posts.service';
 import { UsersService } from './users/users.service';
 import { PrismaService } from './prisma.service';
 import { AuthController } from './auth/auth.controller';
+import { TokenService } from './token/token.service';
 
 @Module({
   imports: [
@@ -18,6 +19,6 @@ import { AuthController } from './auth/auth.controller';
     }),
   ],
   controllers: [AppController, AuthController],
-  providers: [AppService, UsersResolver, PostsService, UsersService, PrismaService],
+  providers: [AppService, UsersResolver, PostsService, UsersService, PrismaService, TokenService],
 })
 export class AppModule {}

@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { User, UserRole } from '@prisma/client';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { NewUserInput, UserPagination } from './users.model';
-import { randomInt } from 'crypto';
-import { hashSync } from 'bcrypt';
+import { hash, genSalt, compare } from 'bcrypt';
 import { IAuthBody, IPayload } from 'src/auth/auth.model';
+import { promisify } from 'util';
 
 @Injectable()
 export class UsersService {
@@ -22,14 +22,14 @@ export class UsersService {
 
   async users(pagination: UserPagination): Promise<User[]> {
     return this.prisma.user.findMany({
-      cursor: {id: pagination.cursorId},
-      take: pagination.take
+      ...(pagination ? { cursor: {id: pagination.cursorId} } : {}),
+      ...(pagination ? { take: pagination.take } : {})
     });
   }
 
   async createUser(data: NewUserInput): Promise<User> {
-    const salt = randomInt(1000)
-    data.password = hashSync(data.password, salt)
+    const salt = await genSalt(8);
+    data.password = await hash(data.password, salt)
     data.salt = salt;
     return this.prisma.user.create({
       data,
@@ -42,14 +42,12 @@ export class UsersService {
         email: authData.email
       }
     })
-    const hashedPass = hashSync(authData.password, userData.salt);
-    if (hashedPass !== userData.password) {
-      throw new Error('Unauthorized');
-    }
-    return { 
+    const res = await compare(authData.password, userData.password);
+    if (res) return {
       name: userData.name,
       email: userData.email,
       role: userData.role
     }
+    else throw new UnauthorizedException();
   }
 }

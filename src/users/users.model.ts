@@ -1,11 +1,7 @@
 import { Field, ID, InputType, ObjectType } from "@nestjs/graphql";
+import { UserRole } from "@prisma/client";
 import { Post } from "src/posts/posts.model";
 
-export enum UserRole {
-    admin = "admin",
-    user = "user"
-}
-  
 @ObjectType({ description: 'user' })
 export class User {
 
@@ -42,15 +38,15 @@ export class NewUserInput {
   @Field()
   role: UserRole;
 
-  @Field()
-  salt?: number;
+  @Field({nullable: true})
+  salt: string;
 }
 
 @InputType({ description: 'offset pagination' })
 export class UserPagination {
-  @Field()
+  @Field({ nullable: true })
   cursorId: number;
 
-  @Field()
+  @Field({ nullable: true })
   take: number;
 }

@@ -20,7 +20,7 @@ model User {
   email String  @unique
   name  String?
   password String
-  salt Int @default(1)
+  salt String
   role UserRole
   posts Post[]
 }
