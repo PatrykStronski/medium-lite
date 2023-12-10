@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  nest:
+    build: .
+    ports:
+      - "3000:3000"
+    links: 
+      - postgres
+    depends_on:
+      - postgres
+    environment:
+      - INSERT_ADMIN=1
+
+  postgres:
+    image: "postgres"
+    environment:
+      - "POSTGRES_USER=postgres"
+      - "POSTGRES_PASSWORD=postgres"
+      - "POSTGRES_DB=mydb"
+    ports:
+      - 5432:5432
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:5432"]
+        interval: 30s
+        timeout: 10s
+        retries: 5

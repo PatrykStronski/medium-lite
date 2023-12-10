@@ -3,11 +3,10 @@ FROM node:18
 WORKDIR /app
 
 COPY package*.json ./
-
-RUN npm install
-
+COPY entrypoint.sh /entrypoint.sh
 COPY . .
 
-RUN npm run build
+RUN npm install
+RUN chmod +x /entrypoint.sh
 
-CMD [ "npm", "run", "start:dev" ]
+ENTRYPOINT ["/entrypoint.sh"]

@@ -10,15 +10,17 @@ import { UsersService } from './users/users.service';
 import { PrismaService } from './prisma.service';
 import { AuthController } from './auth/auth.controller';
 import { TokenService } from './token/token.service';
+import { PostsResolver } from './posts/posts.resolver';
 
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      includeStacktraceInErrorResponses: false
     }),
   ],
   controllers: [AppController, AuthController],
-  providers: [AppService, UsersResolver, PostsService, UsersService, PrismaService, TokenService],
+  providers: [AppService, UsersResolver, PostsResolver, PostsService, UsersService, PrismaService, TokenService],
 })
 export class AppModule {}

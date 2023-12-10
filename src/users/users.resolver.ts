@@ -6,18 +6,18 @@ import { AdminActivateGuard } from "src/guards/admin-activate.guard";
 
 @Resolver(() => User)
 export class UsersResolver {
-    constructor(private usersService: UsersService) {}
-  
+    constructor(private usersService: UsersService) { }
+
     @Query(() => User)
     @UseGuards(AdminActivateGuard)
     async user(@Args('id') id: number) {
-      return await this.usersService.user(id);
+        return await this.usersService.user(id);
     }
 
     @Query(() => [User])
     @UseGuards(AdminActivateGuard)
-    async users(@Args({name: 'pagination', nullable: true}) pagination: UserPagination) {
-        return await this.usersService.users(pagination);
+    async users(@Args({ name: 'cursor', nullable: true }) cursor: number, @Args({ name: 'take', nullable: true }) take: number) {
+        return await this.usersService.users(cursor, take);
     }
 
     @Mutation(() => User)
