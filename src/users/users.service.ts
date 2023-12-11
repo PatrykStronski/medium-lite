@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { User, UserRole } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { NewUserInput, UserPagination } from './users.model';
-import { randomInt } from 'crypto';
-import { hashSync } from 'bcrypt';
-import { IAuthBody, IPayload } from 'src/auth/auth.model';
+import { hash, genSalt, compare } from 'bcrypt';
+import { AuthBodyDto, IPayload, TokenType } from 'src/auth/auth.model';
+import { GraphQLError } from 'graphql';
+
+const MAX_PAGE_SIZE = 10;
 
 @Injectable()
 export class UsersService {
@@ -20,36 +22,57 @@ export class UsersService {
     });
   }
 
-  async users(pagination: UserPagination): Promise<User[]> {
+  async users(cursor = 0, take = MAX_PAGE_SIZE): Promise<User[]> {
     return this.prisma.user.findMany({
-      cursor: {id: pagination.cursorId},
-      take: pagination.take
+      cursor: {id: cursor},
+      take
     });
   }
 
   async createUser(data: NewUserInput): Promise<User> {
-    const salt = randomInt(1000)
-    data.password = hashSync(data.password, salt)
-    data.salt = salt;
-    return this.prisma.user.create({
-      data,
-    });
+    try {
+      const salt = await genSalt(8);
+      data.password = await hash(data.password, salt)
+      data.salt = salt;
+      return this.prisma.user.create({
+        data,
+      });
+    } catch (e) {
+      console.error(e)
+      throw new GraphQLError('Cannot create user', { extensions: { code: '400' } });
+    }
   }
 
-  async authorizeUser(authData: IAuthBody): Promise<IPayload> {
+  async authorizeUser(authData: AuthBodyDto): Promise<IPayload> {
     const userData = await this.prisma.user.findUnique({
       where: {
         email: authData.email
       }
-    })
-    const hashedPass = hashSync(authData.password, userData.salt);
-    if (hashedPass !== userData.password) {
-      throw new Error('Unauthorized');
+    });
+    if (!userData) {
+      throw new UnauthorizedException({message: 'Wrong user or password'})
     }
-    return { 
+    const res = await compare(authData.password, userData.password);
+    if (res) return {
+      type: TokenType.standard,
+      userId: userData.id,
       name: userData.name,
       email: userData.email,
       role: userData.role
     }
+    else throw new UnauthorizedException({message: 'Wrong user or password'});
+  }
+
+  async createAdmin(admin: NewUserInput) {
+    const salt = await genSalt(8);
+    admin.password = await hash(admin.password, salt)
+    admin.salt = salt;
+    await this.prisma.user.upsert({
+      where: {
+        email: admin.email
+      },
+      create: admin,
+      update: admin
+    })
   }
 }

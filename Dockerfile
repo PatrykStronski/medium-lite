@@ -3,11 +3,13 @@ FROM node:18
 WORKDIR /app
 
 COPY package*.json ./
-
-RUN npm install
-
+COPY entrypoint.sh /entrypoint.sh
 COPY . .
 
-RUN npm run build
+RUN npm install
+RUN chmod +x /entrypoint.sh
+RUN mkdir ./src/keys
+RUN openssl genrsa -out ./src/keys/key.pem 2048
+RUN openssl rsa -in ./src/keys/key.pem -outform PEM -pubout -out ./src/keys/public.pem
 
-CMD [ "npm", "run", "start:dev" ]
+ENTRYPOINT ["/entrypoint.sh"]

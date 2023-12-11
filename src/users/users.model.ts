@@ -1,11 +1,8 @@
-import { Field, ID, InputType, ObjectType } from "@nestjs/graphql";
+import { Field, HideField, ID, InputType, ObjectType } from "@nestjs/graphql";
+import { UserRole } from "@prisma/client";
+import { IsEmail, IsEnum, IsNumber, IsPositive, IsString, MinLength } from "class-validator";
 import { Post } from "src/posts/posts.model";
 
-export enum UserRole {
-    admin = "admin",
-    user = "user"
-}
-  
 @ObjectType({ description: 'user' })
 export class User {
 
@@ -18,8 +15,11 @@ export class User {
   @Field()
   email: string; // unique
 
-  @Field()
+  @HideField()
   password: string;
+
+  @HideField()
+  salt: string;
 
   @Field()
   role: UserRole;
@@ -31,26 +31,32 @@ export class User {
 @InputType({ description: 'user' })
 export class NewUserInput {
   @Field()
+  @IsString()
   name: string;
 
   @Field()
+  @IsEmail()
   email: string; // unique
 
   @Field()
+  @MinLength(6)
   password: string;
 
   @Field()
+  @IsEnum(UserRole)
   role: UserRole;
 
-  @Field()
-  salt?: number;
-}
+  @Field({ nullable: true })
+  salt: string;
+  }
 
 @InputType({ description: 'offset pagination' })
 export class UserPagination {
-  @Field()
+  @Field({ nullable: true })
+  @IsPositive()
   cursorId: number;
 
-  @Field()
+  @Field({ nullable: true })
+  @IsPositive()
   take: number;
 }
