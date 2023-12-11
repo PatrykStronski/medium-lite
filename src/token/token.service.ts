@@ -7,8 +7,8 @@ import { GraphQLError } from 'graphql';
 
 @Injectable()
 export class TokenService {
-    private privateKey = readFileSync('src/keys/id_rsa.key', 'utf8');
-    private publicKey = readFileSync('src/keys/id_rsa.pub.key', 'utf8');
+    private privateKey = readFileSync('src/keys/key.pem', 'utf8');
+    private publicKey = readFileSync('src/keys/public.pem', 'utf8');
 
     createTokens(payload: IPayload): IToken {
         try {

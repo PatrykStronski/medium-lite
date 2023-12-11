@@ -22,7 +22,8 @@ describe('TokenService', () => {
     const tokens = service.createTokens(payload);
     let err;
     try {
-      service.verifyToken(tokens.token);
+      const verified = service.verifyToken(tokens.token);
+      expect(payload.email).toBe(verified.email)
     } catch (e) {
       err = e;
     }

@@ -39,11 +39,11 @@ export class PostsService {
     }
 
     async markPostViewed(postId: number, userId: number) {
-        return this.prisma.view.create({
-            data: {
-                postId,
-                userId,
-            }
+        const input = {postId,userId}
+        return this.prisma.view.upsert({
+            where: { postId_userId: input },
+            update: {},
+            create: input
         })
     }
 }
