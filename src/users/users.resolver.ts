@@ -1,5 +1,5 @@
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { NewUserInput, User, UserPagination } from "./users.model";
+import { NewUserInput, User } from "./users.model";
 import { UsersService } from "./users.service";
 import { UseGuards } from "@nestjs/common";
 import { AdminActivateGuard } from "src/guards/admin-activate.guard";

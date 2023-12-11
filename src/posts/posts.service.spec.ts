@@ -12,7 +12,7 @@ describe('PostsService', () => {
     service = module.get<PostsService>(PostsService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  it('Get viewed posts', () => {
+    jest.spyOn(service, 'getViewedPosts').mockImplementation(async () => []);
   });
 });

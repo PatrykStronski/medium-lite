@@ -22,7 +22,13 @@ export class TokenService {
     }
 
     refreshToken(refresh: string, email: string): IToken {
-        const payload = jwt.verify(refresh, 'secret') as IPayload;
+        let payload;
+        try {
+        payload = jwt.verify(refresh, this.privateKey) as IPayload;
+        } catch (e) {
+            console.error(e);
+            throw new UnauthorizedException({ message: 'Unable to verify refresh token'})
+        }
         if (payload.email !== email) {
             throw new UnauthorizedException({ message: 'Email in payload and body not matching' });
         }

@@ -63,14 +63,7 @@ export class UsersService {
     else throw new UnauthorizedException({message: 'Wrong user or password'});
   }
 
-  async createAdmin() {
-    const admin = {
-      name: 'admin',
-      email: 'admin@admin.admin',
-      password: 'admin',
-      role: UserRole.admin,
-      salt: ''
-    }
+  async createAdmin(admin: NewUserInput) {
     const salt = await genSalt(8);
     admin.password = await hash(admin.password, salt)
     admin.salt = salt;
